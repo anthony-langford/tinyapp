@@ -30,7 +30,7 @@ server.get("/urls.json", (request, response) => {
 
 server.get("/urls", (request, response) => {
   let templateVars = {urls: urlDatabase};
-  response.render("index", urlDatabase);
+  response.render("index", templateVars);
 });
 
 server.get("/urls/new", (request, response) => {
@@ -50,7 +50,7 @@ server.get("/urls/:id", (request, response) => {
 });
 
 server.get("/u/:shortURL", (request, response) => {
-  let longURL = urlDatabase[shortURL];
+  let longURL = urlDatabase[request.params.shortURL];
   response.redirect(longURL);
 });
 
