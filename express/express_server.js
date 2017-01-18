@@ -32,12 +32,6 @@ server.use(cookieParser());
 server.set("view engine", "ejs");
 server.use(express.static("public"));
 
-let userVars = {
-  username: req.cookies["username"],
-  // ... any other vars
-};
-
-res.render("urls_index", templateVars);
 
 let urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
@@ -57,15 +51,18 @@ server.get("/", (request, response) => {
 });
 
 server.get("/login", (request, response) => {
-  response.render("login");
+  let userVars = {
+    username: request.cookies["username"],
+    // ... any other vars
+  };
+  response.render("login", userVars);
 })
 
 server.post("/login", (request, response) => {
   response.cookie("username", request.body.username, {maxAge: 864000});
-  response.writeHead(200, {"Content-type": "text/html"});
-  response.write(JSON.stringify(request.cookies) + "<br/>\n");
-  response.end("Thanks!\n");
-  // response.redirect("/");
+  // response.writeHead(200, {"Content-type": "text/html"});
+  // response.write(JSON.stringify(request.cookies) + "<br/>\n");
+  response.redirect("/");
 })
 
 server.get("/urls.json", (request, response) => {
@@ -73,12 +70,16 @@ server.get("/urls.json", (request, response) => {
 });
 
 server.get("/urls", (request, response) => {
+  let userVars = {
+    username: request.cookies["username"],
+    // ... any other vars
+  };
   let templateVars = {urls: urlDatabase};
-  response.render("index", templateVars);
+  response.render("index", templateVars, userVars);
 });
 
 server.get("/urls/new", (request, response) => {
-  response.render("urls_new");
+  response.render("urls_new", userVars);
 });
 
 server.post("/urls", (request, response) => {
@@ -94,9 +95,13 @@ server.post("/urls", (request, response) => {
 });
 
 server.get("/urls/:id", (request, response) => {
+  let userVars = {
+    username: request.cookies["username"],
+    // ... any other vars
+  };
   let templateVars = {shortURL: request.params.id,
                       urls: urlDatabase};
-  response.render("urls_show", templateVars);
+  response.render("urls_show", templateVars, userVars);
 });
 
 server.get("/u/:shortURL", (request, response) => {

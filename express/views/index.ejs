@@ -6,7 +6,6 @@
 
   <body>
     <% include partials/_header %>
-    <h1>Hello World</h1>
     <ul>
     <% for(let shortURL in urls) { %>
       <li><%=shortURL%> &#8594; <%= urls[shortURL]%></li>
