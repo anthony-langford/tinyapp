@@ -24,11 +24,18 @@
       </div>
     </nav>
 
-    <form action="/login" method="POST" style="margin: 0px;">
-      <label for="username">LOGIN:</label>
-      <input id="username" type="text" name="username" placeholder="http://" style="width: 300px">
-      <input type="submit" value="Submit">
-    </form>
+    <% if (username) { %>
+      <form action="/logout" method="POST" style="margin: 0px;">
+        <%= username %>
+        <button>LOGOUT</button>
+      </form>
+    <% } else { %>
+      <form action="/login" method="POST" style="margin: 0px;">
+        <label for="username">LOGIN:</label>
+        <input id="username" type="text" name="username" placeholder="http://" style="width: 300px">
+        <input type="submit" value="Submit">
+      </form>
+    <% } %>
 
   </body>
 </html>

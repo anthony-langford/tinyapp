@@ -22,13 +22,6 @@ server.use(bodyParser.urlencoded({extended: true}));
 const cookieParser = require('cookie-parser');
 server.use(cookieParser());
 
-// server.get("*", function(request, response) {
-//   response.cookie("pet", "cat", {maxAge: 86400000});
-//   response.writeHead(200, {"Content-type": "text/html"});
-//   response.write(JSON.stringify(request.cookies) + "<br/>\n");
-//   response.end("Thanks");
-// })
-
 server.set("view engine", "ejs");
 server.use(express.static("public"));
 
@@ -47,39 +40,34 @@ server.listen(8080, function() {
 });
 
 server.get("/", (request, response) => {
-  response.render("homepage");
+  let templateVars = {username: request.cookies["username"]};
+  response.render("homepage", templateVars);
 });
 
 server.get("/login", (request, response) => {
-  let userVars = {
-    username: request.cookies["username"],
-    // ... any other vars
-  };
-  response.render("login", userVars);
+  let templateVars = {username: request.cookies["username"]};
+  response.render("login", templateVars);
 })
 
 server.post("/login", (request, response) => {
   response.cookie("username", request.body.username, {maxAge: 864000});
-  // response.writeHead(200, {"Content-type": "text/html"});
-  // response.write(JSON.stringify(request.cookies) + "<br/>\n");
   response.redirect("/");
 })
 
-server.get("/urls.json", (request, response) => {
-  response.json(urlDatabase);
-});
+server.post("/logout", (request, response) => {
+  response.clearCookie("username");
+  response.redirect("/");
+})
 
 server.get("/urls", (request, response) => {
-  let userVars = {
-    username: request.cookies["username"],
-    // ... any other vars
-  };
-  let templateVars = {urls: urlDatabase};
-  response.render("index", templateVars, userVars);
+  let templateVars = {urls: urlDatabase,
+                      username: request.cookies["username"]};
+  response.render("index", templateVars);
 });
 
 server.get("/urls/new", (request, response) => {
-  response.render("urls_new", userVars);
+  let templateVars = {username: request.cookies["username"]};
+  response.render("urls_new", templateVars);
 });
 
 server.post("/urls", (request, response) => {
@@ -95,13 +83,10 @@ server.post("/urls", (request, response) => {
 });
 
 server.get("/urls/:id", (request, response) => {
-  let userVars = {
-    username: request.cookies["username"],
-    // ... any other vars
-  };
   let templateVars = {shortURL: request.params.id,
-                      urls: urlDatabase};
-  response.render("urls_show", templateVars, userVars);
+                      urls: urlDatabase,
+                      username: request.cookies["username"]};
+  response.render("urls_show", templateVars);
 });
 
 server.get("/u/:shortURL", (request, response) => {
