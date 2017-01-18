@@ -1,6 +1,18 @@
 const express = require("express");
 const server = express();
 
+// const jsonfile = require('jsonfile')
+// let db_path = './db.json';
+// const db = jsonfile.readFileSync(db_path);
+
+// jsonfile.readFile(db_path, function(err, obj) {
+//   console.dir(obj);
+// })
+
+// jsonfile.writeFile(db_path, data, function() {
+//   res.redirect('/');
+// });
+
 const bodyParser = require("body-parser");
 server.use(bodyParser.urlencoded({extended: true}));
 
@@ -60,10 +72,21 @@ server.post("/urls/:id/delete", (request, response) => {
 });
 
 server.post("/urls/:id/update", (request, response) => {
-  delete urlDatabase[request.params.id];
-  urlDatabase[request.params.id] = request.body.newlongURL;
+  urlDatabase[request.params.id] = request.body.newLongURL;
   response.redirect("/urls");
 });
+
+// middleware, just like get and post. get and post also technically receive next but they respond to the server so they don't need to pass it on
+// server.use(function(request, response, next) {
+//   console.log('A new request has come in...');
+//   next();
+//   response.send(response);
+// });
+
+// add middleware function at the end to check if the route was found. if not, redirect to error page. can also send html instead of plaintext
+// server.use(function(request, response, next) {
+//   response.status(404).send('Sorry the page was not found');
+// });
 
 
 // // create another route where you can input a person's name - anything after the / is set to 'name'
