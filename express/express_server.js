@@ -25,6 +25,10 @@ server.use(cookieParser());
 server.set("view engine", "ejs");
 server.use(express.static("public"));
 
+let users = {
+  "userRandomID": {id: "userRandomID", email: "user@example.com", password: "unicorns"},
+  "user2RandomID": {id: "user2RandomID", email: "user2@example.com", password: "ligers"
+}
 
 let urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
@@ -52,6 +56,17 @@ server.get("/login", (request, response) => {
 server.post("/login", (request, response) => {
   response.cookie("username", request.body.username, {maxAge: 864000});
   response.redirect("/");
+})
+
+server.get("/register", (request, response) => {
+  let templateVars = {username: request.cookies["username"]};
+  response.render("register", templateVars);
+})
+
+server.post("/register", (rewuest, response) => {
+  users[username] = {request.body.id, request.body.email, request.body.password};
+  response.cookie("username", request.body.username, {maxAge: 864000});
+  response.render("register");
 })
 
 server.post("/logout", (request, response) => {

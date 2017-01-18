@@ -19,23 +19,10 @@
           <li class="active"><a href="/">Home</a></li>
           <li><a href="/urls/new">New URL</a></li>
           <li><a href="/urls">URL List</a></li>
-          <li><a href="#">Page 3</a></li>
+          <li><a href="/register">Register</a></li>
         </ul>
       </div>
     </nav>
-
-    <% if (username) { %>
-      <form action="/logout" method="POST" style="margin: 0px;">
-        <%= username %>
-        <button>LOGOUT</button>
-      </form>
-    <% } else { %>
-      <form action="/login" method="POST" style="margin: 0px;">
-        <label for="username">LOGIN:</label>
-        <input id="username" type="text" name="username" placeholder="http://" style="width: 300px">
-        <input type="submit" value="Submit">
-      </form>
-    <% } %>
 
   </body>
 </html>
