@@ -10,6 +10,10 @@
     <ul>
     <% for(let shortURL in urls) { %>
       <li><%= shortURL %> &#8594; <%= urls[shortURL]%></li>
+      <form method="GET" action="/urls/<%= shortURL %>/">
+        <button>Edit</button>
+        <!-- <input type="image" src="~./Users/heyzeus/lighthouse/tinyapp/trashfull@2x/"> put this into button?-->
+      </form>
       <form method="POST" action="/urls/<%= shortURL %>/delete">
         <button>Delete</button>
         <!-- <input type="image" src="~./Users/heyzeus/lighthouse/tinyapp/trashfull@2x/"> put this into button?-->
