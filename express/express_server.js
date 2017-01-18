@@ -1,9 +1,12 @@
 const express = require("express");
 const server = express();
 
-// const jsonfile = require('jsonfile')
+const jsonfile = require('jsonfile');
 // let db_path = './db.json';
 // const db = jsonfile.readFileSync(db_path);
+
+// server.use('/', require('./routes/index'));
+// server.use('/users', require('./routes/users'));
 
 // jsonfile.readFile(db_path, function(err, obj) {
 //   console.dir(obj);
@@ -16,8 +19,25 @@ const server = express();
 const bodyParser = require("body-parser");
 server.use(bodyParser.urlencoded({extended: true}));
 
+const cookieParser = require('cookie-parser');
+server.use(cookieParser());
+
+// server.get("*", function(request, response) {
+//   response.cookie("pet", "cat", {maxAge: 86400000});
+//   response.writeHead(200, {"Content-type": "text/html"});
+//   response.write(JSON.stringify(request.cookies) + "<br/>\n");
+//   response.end("Thanks");
+// })
+
 server.set("view engine", "ejs");
 server.use(express.static("public"));
+
+let userVars = {
+  username: req.cookies["username"],
+  // ... any other vars
+};
+
+res.render("urls_index", templateVars);
 
 let urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
@@ -26,15 +46,27 @@ let urlDatabase = {
 
 function generateRandomString() {
   return Math.random().toString(36).substr(2, 6);
-}
+};
 
 server.listen(8080, function() {
   console.log("Server started");
-})
+});
 
 server.get("/", (request, response) => {
   response.render("homepage");
 });
+
+server.get("/login", (request, response) => {
+  response.render("login");
+})
+
+server.post("/login", (request, response) => {
+  response.cookie("username", request.body.username, {maxAge: 864000});
+  response.writeHead(200, {"Content-type": "text/html"});
+  response.write(JSON.stringify(request.cookies) + "<br/>\n");
+  response.end("Thanks!\n");
+  // response.redirect("/");
+})
 
 server.get("/urls.json", (request, response) => {
   response.json(urlDatabase);
@@ -52,6 +84,12 @@ server.get("/urls/new", (request, response) => {
 server.post("/urls", (request, response) => {
   let shortURL = generateRandomString();
   urlDatabase[shortURL] = request.body.longURL;
+  // const data = {
+  //   shortURL: request.body.longURL
+  // }
+  // jsonfile.writeFile(db_path, data, function() {
+  //   res.redirect('/');
+  // });
   response.redirect("/urls/" + shortURL);
 });
 
