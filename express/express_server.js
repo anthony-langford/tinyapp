@@ -20,7 +20,7 @@ const bodyParser = require("body-parser");
 server.use(bodyParser.urlencoded({extended: true}));
 
 const cookieParser = require('cookie-parser');
-server.use(cookieParser());
+server.use(cookieParser('thisismycookiesecret'));
 
 server.set("view engine", "ejs");
 server.use(express.static("public"));
@@ -59,7 +59,8 @@ server.post("/login", (request, response) => {
 });
 
 server.get("/register", (request, response) => {
-  let templateVars = {userList: users};
+  let templateVars = {userList: users,
+                      username: request.cookies["username"]};
   response.render("register", templateVars);
 });
 
