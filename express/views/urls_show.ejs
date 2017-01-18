@@ -1,19 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
-  <% include partials/_header %>
+  <head>
+    <title>Your New URL</title>
+  </head>
 
   <body>
+    <% include partials/_header %>
     <h1>Hello World</h1>
-      <%= "Your shortened URL is: " + shortURL %>
-      <br/>
-      <%= "Full URL : " + urls[shortURL] %>
+    <%= "Your shortened URL is " %> &#8594; <%= shortURL %>
+    <br/>
+    <%= "Your full URL is " %> &#8594; <%= urls[shortURL] %>
 
-    <br/>
-    <br/>
-   <!--  Shorten a URL here:
-    <form method="POST">
-      <input>
-      <button>
-    </form> -->
-    </body>
+    <form method="POST" action="/urls/<%= shortURL %>/delete">
+      <button>Delete</button>
+      <!-- <input type="image" src="~./Users/heyzeus/lighthouse/tinyapp/trashfull@2x/"/> put this into button?-->
+    </form>
+
+    <form method="POST" action="/urls/<%= shortURL %>/update">
+      <label for="newLongURL">Enter a URL:</label>
+      <input id="newLongURL" type="text" name="newLongURL" placeholder="http://" style="width: 300px">
+      <input type="submit" value="Submit">
+      <!-- <button>Update</button> -->
+    </form>
   </body>
