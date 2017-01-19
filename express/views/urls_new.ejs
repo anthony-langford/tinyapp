@@ -6,7 +6,7 @@
 
   <body>
     <% include partials/_header %>
-    <% if (!userid) { %>
+    <% if (!user_id) { %>
       <% include partials/_login %>
     <% } %>
     <form action="/urls" method="POST" style="margin: 0px;">

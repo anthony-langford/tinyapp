@@ -3,15 +3,12 @@
   <head></head>
 
   <body>
-  <% if (userid) { %>
-      <form action="/logout" method="POST" style="margin: 0px;">
-        <%= email %>
-        <button>LOGOUT</button>
-      </form>
-  <% } %>
+
       <form action="/login" method="POST" style="margin: 0px;">
-        <label for="email">LOGIN:</label>
+        <label for="email">Email:</label>
         <input id="email" type="email" name="email" placeholder="http://" style="width: 300px">
+        <label for="password">Password:</label>
+        <input id="password" type="password" name="password" placeholder="http://" style="width: 300px">
         <input type="submit" value="Submit">
       </form>
 
