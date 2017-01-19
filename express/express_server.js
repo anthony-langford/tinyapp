@@ -20,7 +20,7 @@ const bodyParser = require("body-parser");
 server.use(bodyParser.urlencoded({extended: true}));
 
 const cookieParser = require('cookie-parser');
-server.use(cookieParser('thisismycookiesecret'));
+server.use(cookieParser("secretpassword"));
 
 server.set("view engine", "ejs");
 server.use(express.static("public"));
@@ -44,23 +44,29 @@ server.listen(8080, function() {
 });
 
 server.get("/", (request, response) => {
-  let templateVars = {username: request.cookies["username"]};
+  let templateVars = {
+    userid: request.cookies["userid"],
+    email: users[request.cookies["userid"]] && users[request.cookies["userid"]].email
+  };
+
   response.render("homepage", templateVars);
 });
 
 server.get("/login", (request, response) => {
-  let templateVars = {username: request.cookies["username"]};
+  let templateVars = {userid: request.cookies["userid"]};
   response.render("login", templateVars);
 });
 
 server.post("/login", (request, response) => {
-  response.cookie("username", request.body.username, {maxAge: 864000});
+  response.cookie("userid", request.body.username, {maxAge: 864000});
   response.redirect("/");
 });
 
 server.get("/register", (request, response) => {
-  let templateVars = {userList: users,
-                      username: request.cookies["username"]};
+  let templateVars = {
+    userList: users,
+    userid: request.cookies["userid"]
+  };
   response.render("register", templateVars);
 });
 
@@ -76,24 +82,30 @@ server.post("/register", (request, response) => {
     };
   };
   let userid = generateRandomString();
-  users[userid] = {id: userid, email: request.body.email, password: request.body.password};
-  response.cookie(userid, request.body.username, {maxAge: 864000});
+  users[userid] = {
+    id: userid,
+    email: request.body.email,
+    password: request.body.passwor
+  };
+  response.cookie("userid", userid, {maxAge: 864000});
   response.redirect("/");
 });
 
 server.post("/logout", (request, response) => {
-  response.clearCookie("username");
+  response.clearCookie("userid");
   response.redirect("/");
 });
 
 server.get("/urls", (request, response) => {
-  let templateVars = {urls: urlDatabase,
-                      username: request.cookies["username"]};
+  let templateVars = {
+    urls: urlDatabase,
+    userid: request.cookies["userid"]
+  };
   response.render("index", templateVars);
 });
 
 server.get("/urls/new", (request, response) => {
-  let templateVars = {username: request.cookies["username"]};
+  let templateVars = {userid: request.cookies["userid"]};
   response.render("urls_new", templateVars);
 });
 
@@ -110,9 +122,11 @@ server.post("/urls", (request, response) => {
 });
 
 server.get("/urls/:id", (request, response) => {
-  let templateVars = {shortURL: request.params.id,
-                      urls: urlDatabase,
-                      username: request.cookies["username"]};
+  let templateVars = {
+    shortURL: request.params.id,
+    urls: urlDatabase,
+    userid: request.cookies["userid"]
+  };
   response.render("urls_show", templateVars);
 });
 

@@ -19,9 +19,9 @@
           <li class="active"><a href="/">Home</a></li>
           <li><a href="/urls/new">New URL</a></li>
           <li><a href="/urls">URL List</a></li>
-          <li><a href="/login">Login</a></li>
-          <% if (!username) { %>
-            <li><a href="/register">Register</a></li>
+          <% if (!userid) { %>
+              <li><a href="/login">Login</a></li>
+              <li><a href="/register">Register</a></li>
           <% } %>
         </ul>
       </div>

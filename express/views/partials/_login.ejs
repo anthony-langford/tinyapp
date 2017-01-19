@@ -3,18 +3,18 @@
   <head></head>
 
   <body>
-    <% if (username) { %>
+  <% if (userid) { %>
       <form action="/logout" method="POST" style="margin: 0px;">
-        <%= username %>
+        <%= email %>
         <button>LOGOUT</button>
       </form>
-    <% } else { %>
+  <% } %>
       <form action="/login" method="POST" style="margin: 0px;">
-        <label for="username">LOGIN:</label>
-        <input id="username" type="text" name="username" placeholder="http://" style="width: 300px">
+        <label for="email">LOGIN:</label>
+        <input id="email" type="email" name="email" placeholder="http://" style="width: 300px">
         <input type="submit" value="Submit">
       </form>
-    <% } %>
+
   </body>
 
 </html>

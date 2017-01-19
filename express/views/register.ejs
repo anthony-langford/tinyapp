@@ -6,7 +6,9 @@
 
   <body>
     <% include partials/_header %>
-
+    <% if (!userid) { %>
+      <% include partials/_login %>
+    <% } %>
     <form method="POST" action="/register">
       <label for="email">Enter your email:</label>
       <input id="email" type="email" name="email" placeholder="http://" style="width: 300px">
