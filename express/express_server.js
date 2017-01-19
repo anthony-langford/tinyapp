@@ -1,25 +1,13 @@
 const express = require("express");
-const server = express();
 const jsonfile = require('jsonfile');
 const debug = require('debug');
 const bcrypt = require('bcrypt');
 const morgan = require('morgan');
 const bodyParser = require("body-parser");
 const cookieSession = require('cookie-session');
+const methodOverride = require('method-override');
+const server = express();
 
-// let db_path = './db.json';
-// const db = jsonfile.readFileSync(db_path);
-
-// server.use('/', require('./routes/index'));
-// server.use('/users', require('./routes/users'));
-
-// jsonfile.readFile(db_path, function(err, obj) {
-//   console.dir(obj);
-// })
-
-// jsonfile.writeFile(db_path, data, function() {
-//   res.redirect('/');
-// });
 
 
 server.set("view engine", "ejs");
@@ -35,7 +23,9 @@ server.use(cookieSession({
 
 server.use(express.static("public"));
 
-server.use(morgan('dev'))
+server.use(morgan('dev'));
+
+server.use(methodOverride('_method'));
 
 server.listen(8080, function() {
   console.log("Server started");
@@ -104,7 +94,6 @@ server.post("/login", (request, response) => {
 
         if (matched) {
           // set a cookie
-          // response.cookie('user_id', user.username, {signed: true});
           request.session.user_id = users[user].id;
           response.redirect("/");
           return;
@@ -213,12 +202,12 @@ server.get("/u/:shortURL", (request, response) => {
   response.redirect(longURL);
 });
 
-server.post("/urls/:id/delete", (request, response) => {
+server.delete("/urls/:id/", (request, response) => {
   delete users[request.session.user_id].links[request.params.id];
   response.redirect("/urls");
 });
 
-server.post("/urls/:id/update", (request, response) => {
+server.put("/urls/:id/", (request, response) => {
   users[request.session.user_id].links[request.params.id] = request.body.newLongURL;
   response.redirect("/urls");
 });

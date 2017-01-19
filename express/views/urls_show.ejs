@@ -14,12 +14,12 @@
     <br/>
     <%= "Your full URL is " %> &#8594; <%= data[user_id].links[shortURL] %>
 
-    <form method="POST" action="/urls/<%= shortURL %>/delete">
+    <form method="POST" action="/urls/<%= shortURL %>?_method=DELETE">
       <button>Delete</button>
       <!-- <input type="image" src="~./Users/heyzeus/lighthouse/tinyapp/trashfull@2x/"/> put this into button?-->
     </form>
 
-    <form method="POST" action="/urls/<%= shortURL %>/update">
+    <form method="POST" action="/urls/<%= shortURL %>?_method=PUT">
       <label for="newLongURL">Enter your new URL:</label>
       <input id="newLongURL" type="text" name="newLongURL" placeholder="http://" style="width: 300px">
       <input type="submit" value="Update">
