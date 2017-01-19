@@ -209,17 +209,17 @@ server.get("/urls/:id", (request, response) => {
 });
 
 server.get("/u/:shortURL", (request, response) => {
-  let longURL = urlDatabase[request.params.shortURL];
+  let longURL = users[request.session.user_id].links[request.params.shortURL];
   response.redirect(longURL);
 });
 
 server.post("/urls/:id/delete", (request, response) => {
-  delete urlDatabase[request.params.id];
+  delete users[request.session.user_id].links[request.params.id];
   response.redirect("/urls");
 });
 
 server.post("/urls/:id/update", (request, response) => {
-  urlDatabase[request.params.id] = request.body.newLongURL;
+  users[request.session.user_id].links[request.params.id] = request.body.newLongURL;
   response.redirect("/urls");
 });
 
