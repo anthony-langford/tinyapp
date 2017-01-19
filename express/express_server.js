@@ -2,6 +2,10 @@ const express = require("express");
 const server = express();
 const jsonfile = require('jsonfile');
 const debug = require('debug');
+const bcrypt = require('bcrypt');
+const morgan = require('morgan')
+const bodyParser = require("body-parser");
+const cookieParser = require('cookie-parser');
 
 // let db_path = './db.json';
 // const db = jsonfile.readFileSync(db_path);
@@ -17,14 +21,22 @@ const debug = require('debug');
 //   res.redirect('/');
 // });
 
-const bodyParser = require("body-parser");
-server.use(bodyParser.urlencoded({extended: true}));
-
-const cookieParser = require('cookie-parser');
-server.use(cookieParser("secretpassword"));
 
 server.set("view engine", "ejs");
+
+server.use(bodyParser.urlencoded({extended: true}));
+
+server.use(cookieParser("secretpassword"));
+
 server.use(express.static("public"));
+
+server.use(morgan('dev'))
+
+server.listen(8080, function() {
+  console.log("Server started");
+});
+
+
 
 let users = {
   "userRandomID": {id: "userRandomID", email: "user@example.com", password: "unicorns"},
@@ -40,9 +52,7 @@ function generateRandomString() {
   return Math.random().toString(36).substr(2, 6);
 };
 
-server.listen(8080, function() {
-  console.log("Server started");
-});
+
 
 // routes
 
@@ -78,9 +88,11 @@ server.post("/login", (request, response) => {
   const email = request.body.email;
   const password = request.body.password;
   // find user by email
-  // const user = users.find((user => { return user.email === email})); // need find function
-
-
+  // const user = users.find((user => { return user.email === email}));
+  // if (!user) {
+  //   res.redirect('/login')
+  //   return
+  // }
 
   // // check the password
   // bcrypt.compare(password, user.password, (err, matched) => {
@@ -112,43 +124,52 @@ server.post("/login", (request, response) => {
 server.get("/register", (request, response) => {
   let templateVars = {
     userList: users,
-    user_id: request.cookies["user_id"]
+    user_id: request.cookies["user_id"],
+    email: users[request.cookies["user_id"]] && users[request.cookies["user_id"]].email
   };
   response.render("register", templateVars);
 });
 
 server.post("/register", (request, response) => {
+  // check if email and password are provided, and if email is free to register
   if (!request.body.email || !request.body.password) {
     response.status(400).send('Sorry! You need to provide both an email and a password.');
     return;
   }
+
   for (let user in users) {
     if (users[user].email === request.body.email) {
       response.status(400).send('Sorry! That email address has already been registered. If you think this is a mistake, please contact us somehow.');
       return;
+    }
+  }
+
+  const password = request.body.password;
+  let hashed_password;
+  const user_id = generateRandomString();
+
+  // hash the password and update database
+  bcrypt.hash(password, 10, (err, hash) => {
+
+    if (err) {
+      response.send('There was an error creating your account.')
+      return;
+    }
+
+    hashed_password = hash;
+    users[user_id] = {
+      id: user_id,
+      email: request.body.email,
+      password: hashed_password
     };
-  };
+  });
 
-  // bcrypt.hash(request.body.password, 10, (err, hash) => {
-  //   if (err) {
-  //     response.send('Error');
-  //   } else {
-  //     response.
-  //   }
-  // })
-
-  let user_id = generateRandomString();
-  users[user_id] = {
-    id: user_id,
-    email: request.body.email,
-    password: request.body.password
-  };
   response.cookie("user_id", user_id, {maxAge: 864000});
   response.redirect("/");
 });
 
-server.post("/logout", (request, response) => {
-  response.clearCookie("user_id"); // check to see if it works with signed cookies or else use this response.cookie("user_id", "", {signed: true})
+server.get("/logout", (request, response) => {
+  response.cookie("user_id", "", {signed: true});
   response.redirect("/");
 });
 

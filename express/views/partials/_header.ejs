@@ -24,7 +24,7 @@
               <li><a href="/register">Register</a></li>
           <% } %>
           <% if (user_id) { %>
-            <li><form action="/logout" method="POST" style="margin: 0px;">
+            <li><form action="/logout" method="GET" style="margin: 0px;">
             <%= email %><button>LOGOUT</button></li>
             </form>
           <% } %>
