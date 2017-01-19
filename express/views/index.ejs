@@ -10,8 +10,8 @@
       <% include partials/_login %>
     <% } %>
     <ul>
-    <% for(let shortURL in urls) { %>
-      <li><%= shortURL %> &#8594; <%= urls[shortURL]%></li>
+    <% for(let shortURL in data[user_id].links) { %>
+      <li><%= shortURL %> &#8594; <%= data[user_id].links[shortURL]%></li>
       <form method="GET" action="/urls/<%= shortURL %>/">
         <button>Edit</button>
         <!-- <input type="image" src="~./Users/heyzeus/lighthouse/tinyapp/trashfull@2x/"> put this into button?-->

@@ -7,12 +7,15 @@
   <body>
     <% include partials/_header %>
     <% if (!user_id) { %>
+      You need to login first!
+      <br/>
       <% include partials/_login %>
-    <% } %>
+    <% } else { %>
     <form action="/urls" method="POST" style="margin: 0px;">
       <label for="longURL">Enter a URL:</label>
       <input id="longURL" type="text" name="longURL" placeholder="http://" style="width: 300px">
       <input type="submit" value="Submit">
     </form>
+    <% } %>
   </body>
 </html>

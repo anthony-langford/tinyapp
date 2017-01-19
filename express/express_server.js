@@ -44,8 +44,24 @@ server.listen(8080, function() {
 
 
 let users = {
-  "userRandomID": {id: "userRandomID", email: "user@example.com", password: "unicorns"},
-  "user2RandomID": {id: "user2RandomID", email: "user2@example.com", password: "ligers"}
+  "userRandomID": {
+    id: "userRandomID",
+    email: "user@example.com",
+    password: "unicorns",
+    links: {
+      "b2xVn2": "http://www.lighthouselabs.ca",
+      "9sm5xK": "http://www.google.com"
+    }
+  },
+  "user2RandomID": {
+    id: "user2RandomID",
+    email: "user2@example.com",
+    password: "ligers",
+    links: {
+      "8sm3k9": "http://www.reddit.com",
+      "j30si5": "http://wwwimdb.com"
+    }
+  }
 }
 
 let urlDatabase = {
@@ -141,11 +157,11 @@ server.post("/register", (request, response) => {
     }
 
     hashed_password = hash;
-    console.log(hashed_password);
     users[user_id] = {
       id: user_id,
       email: request.body.email,
-      password: hashed_password
+      password: hashed_password,
+      links: {}
     };
   });
 
@@ -160,7 +176,7 @@ server.get("/logout", (request, response) => {
 
 server.get("/urls", (request, response) => {
   let templateVars = {
-    urls: urlDatabase,
+    data: users,
     user_id: request.session.user_id,
     email: users[request.session.user_id] && users[request.session.user_id].email
   };
@@ -177,20 +193,16 @@ server.get("/urls/new", (request, response) => {
 
 server.post("/urls", (request, response) => {
   let shortURL = generateRandomString();
-  urlDatabase[shortURL] = request.body.longURL;
-  // const data = {
-  //   shortURL: request.body.longURL
-  // }
-  // jsonfile.writeFile(db_path, data, function() {
-  //   res.redirect('/');
-  // });
+  // urlDatabase[shortURL] = request.body.longURL;
+  users[request.session.user_id].links[shortURL] = request.body.longURL;
   response.redirect("/urls/" + shortURL);
 });
 
 server.get("/urls/:id", (request, response) => {
   let templateVars = {
     shortURL: request.params.id,
-    urls: urlDatabase,
+    data: users,
+    email: users[request.session.user_id] && users[request.session.user_id].email,
     user_id: request.session.user_id
   };
   response.render("urls_show", templateVars);

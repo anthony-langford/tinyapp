@@ -12,7 +12,7 @@
     <h1>Hello World</h1>
     <%= "Your shortened URL is " %> &#8594; <%= shortURL %>
     <br/>
-    <%= "Your full URL is " %> &#8594; <%= urls[shortURL] %>
+    <%= "Your full URL is " %> &#8594; <%= data[user_id].links[shortURL] %>
 
     <form method="POST" action="/urls/<%= shortURL %>/delete">
       <button>Delete</button>
