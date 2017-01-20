@@ -16,7 +16,7 @@ server.use(bodyParser.urlencoded({extended: true}));
 
 server.use(cookieSession({
   name: 'session',
-  keys: ['secretpassword'],
+  keys: ['secretpassword', 'evenmoresecretpassword'],
   // Cookie Options
   maxAge: 24 * 60 * 60 * 1000 // 24 hours
 }));
@@ -34,14 +34,14 @@ server.listen(8080, function() {
 
 
 let users = {
-  "userRandomID": {
+  "ieatbutts": {
     id: "userRandomID",
     email: "user@example.com",
     password: "unicorns",
     links: {
       "b2xVn2": "http://www.lighthouselabs.ca",
       "9sm5xK": "http://www.google.com"
-    }
+    },
   },
   "user2RandomID": {
     id: "user2RandomID",
@@ -49,15 +49,33 @@ let users = {
     password: "ligers",
     links: {
       "8sm3k9": "http://www.reddit.com",
-      "j30si5": "http://wwwimdb.com"
+      "j30si5": "http://www.imdb.com"
     }
   }
 }
 
-let urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
-};
+let urlDatabase = [
+  {
+    shortURL: "b2xVn2",
+    longURL: "http://www.lighthouselabs.ca",
+    ownerID: "ieatbutts"
+  },
+  {
+    shortURL: "9sm5xK",
+    longURL:"http://www.google.com",
+    ownerID: "ieatbutts"
+  },
+  {
+    shortURL: "8sm3k9",
+    longURL: "http://www.reddit.com",
+    ownerID: "user2RandomID"
+  },
+  {
+    shortURL: "j30si5",
+    longURL: "http://www.imdb.com",
+    ownerID: "user2RandomID"
+  }
+]
 
 function generateRandomString() {
   return Math.random().toString(36).substr(2, 6);
@@ -68,17 +86,20 @@ function generateRandomString() {
 // routes
 
 server.get("/", (request, response) => {
-
-  let templateVars = {
-    user_id: request.session.user_id,
-    email: users[request.session.user_id] && users[request.session.user_id].email
-  };
-
-  response.render("homepage", templateVars);
+  if (request.session.user_id) {
+    response.redirect("/urls");
+  } else {
+    response.redirect("/login")
+  }
 });
 
 server.get("/login", (request, response) => {
   let templateVars = {user_id: request.session.user_id};
+
+  if (request.session.user_id) {
+    response.redirect("/");
+  }
+
   response.render("login", templateVars);
 });
 
@@ -99,8 +120,7 @@ server.post("/login", (request, response) => {
           return;
 
         } else {
-          response.status(403).send('Sorry! The password you entered was incorrect.');
-          response.redirect("/login");
+          response.status(401).redirect("/login");
           return;
         }
       });
@@ -112,10 +132,15 @@ server.post("/login", (request, response) => {
 
 server.get("/register", (request, response) => {
   let templateVars = {
-    userList: users,
+    data: users,
     user_id: request.session.user_id,
     email: users[request.session.user_id] && users[request.session.user_id].email
   };
+
+  if (request.session.user_id) {
+    response.redirect("/");
+  }
+
   response.render("register", templateVars);
 });
 
@@ -146,24 +171,28 @@ server.post("/register", (request, response) => {
     }
 
     hashed_password = hash;
+
     users[user_id] = {
       id: user_id,
       email: request.body.email,
       password: hashed_password,
       links: {}
     };
-  });
 
-  request.session.user_id = user_id;
-  response.redirect("/");
+    request.session.user_id = user_id;
+    response.redirect("/");
+  });
 });
 
-server.get("/logout", (request, response) => {
+server.post("/logout", (request, response) => {
   request.session = null; // delete cookie
   response.redirect("/");
 });
 
 server.get("/urls", (request, response) => {
+  if (!request.session.user_id) {
+    response.status(401);
+  }
   let templateVars = {
     data: users,
     user_id: request.session.user_id,
@@ -173,6 +202,9 @@ server.get("/urls", (request, response) => {
 });
 
 server.get("/urls/new", (request, response) => {
+  if (!request.session.user_id) {
+    response.status(401);
+  }
   let templateVars = {
     user_id: request.session.user_id,
     email: users[request.session.user_id] && users[request.session.user_id].email
@@ -182,8 +214,12 @@ server.get("/urls/new", (request, response) => {
 
 server.post("/urls", (request, response) => {
   let shortURL = generateRandomString();
-  // urlDatabase[shortURL] = request.body.longURL;
   users[request.session.user_id].links[shortURL] = request.body.longURL;
+  urlDatabase.push({
+    shortURL: shortURL,
+    longURL: request.body.longURL,
+    ownerID: request.session.user_id
+  });
   response.redirect("/urls/" + shortURL);
 });
 
@@ -194,11 +230,47 @@ server.get("/urls/:id", (request, response) => {
     email: users[request.session.user_id] && users[request.session.user_id].email,
     user_id: request.session.user_id
   };
+  let urlExists = false;
+
+  urlDatabase.forEach(function(url) {
+    if (url.shortURL === request.params.id) {
+      urlExists = true;
+    }
+  });
+
+  if (urlExists === false) {
+    response.status(404).send("You're lost! I can't find this page.");
+  } else if (!request.session.user_id) {
+    response.status(401).render("login", templateVars);
+  }
+
+  let isOwner = false;
+  urlDatabase.forEach(function(url) {
+    if (url.ownerID === request.session.user_id) {
+      isOwner = true;
+      return;
+    }
+  });
+
+  if (isOwner === false) {
+      response.status(403).send("YOU SHALL NOT PASS! (You don't own this url)");
+    }
+
   response.render("urls_show", templateVars);
 });
 
 server.get("/u/:shortURL", (request, response) => {
   let longURL = users[request.session.user_id].links[request.params.shortURL];
+  let urlExists = false;
+
+  urlDatabase.forEach(function(url) {
+    if (url.shortURL === request.params.id) {
+      urlExists = true;
+    }
+  });
+  if (urlExists === false) {
+    response.status(404).send("You're lost! I can't find this page.");
+  }
   response.redirect(longURL);
 });
 
@@ -208,33 +280,33 @@ server.delete("/urls/:id/", (request, response) => {
 });
 
 server.put("/urls/:id/", (request, response) => {
+  let urlExists = false;
+
+  urlDatabase.forEach(function(url) {
+    if (url.shortURL === request.params.id) {
+      urlExists = true;
+    }
+  });
+
+  if (urlExists === false) {
+    response.status(404).send("You're lost! I can't find this page.");
+  } else if (!request.session.user_id) {
+    response.status(401).render("login", templateVars);
+  }
+
+  let isOwner = false;
+  urlDatabase.forEach(function(url) {
+    if (url.ownerID === request.session.user_id) {
+      isOwner = true;
+      return;
+    }
+  });
+
+  if (isOwner === false) {
+      response.status(403).send("YOU SHALL NOT PASS! (You don't own this url)");
+    }
+
   users[request.session.user_id].links[request.params.id] = request.body.newLongURL;
   response.redirect("/urls");
 });
 
-
-
-
-
-
-
-// middleware, just like get and post. get and post also technically receive next but they respond to the server so they don't need to pass it on
-// server.use(function(request, response, next) {
-//   console.log('A new request has come in...');
-//   next();
-//   response.send(response);
-// });
-
-// add middleware function at the end to check if the route was found. if not, redirect to error page. can also send html instead of plaintext
-// server.use(function(request, response, next) {
-//   response.status(404).send('Sorry the page was not found');
-// });
-
-
-// // create another route where you can input a person's name - anything after the / is set to 'name'
-// server.get("/:name", function(request, response) {
-//   response.render("index", {name: request.params.name,
-//                             colors: ["red", "green"],
-//                             showMoon: true})
-//   response.send(request.params.name)
-// })

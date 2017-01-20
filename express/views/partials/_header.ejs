@@ -18,14 +18,14 @@
         <ul class="nav navbar-nav">
           <li class="active"><a href="/">Home</a></li>
           <li><a href="/urls/new">New URL</a></li>
-          <li><a href="/urls">URL List</a></li>
+          <li><a href="/urls">My Links</a></li>
           <% if (!user_id) { %>
               <li><a href="/login">Login</a></li>
               <li><a href="/register">Register</a></li>
           <% } %>
           <% if (user_id) { %>
-            <li><form action="/logout" method="GET" style="margin: 0px;">
-            <%= email %><button>LOGOUT</button></li>
+            <li><form action="/logout" method="POST" style="margin: 0px;">
+              <%= email %><button>LOGOUT</button></li>
             </form>
           <% } %>
         </ul>
