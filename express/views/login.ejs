@@ -5,8 +5,13 @@
   </head>
 
   <body>
-    <% include partials/_header %>
-    <% include partials/_login %>
+    <div style="margin: 15px">
+      <% include partials/_header %>
+      <% if (!user_id) { %>
+          <h1>Welcome to my first app!<br/>Play with it.<br/>Do it.<br/>Now.</h1>
+      <% } %>
+      <% include partials/_login %>
+    </div>
   </body>
 
 </html>

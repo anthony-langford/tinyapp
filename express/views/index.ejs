@@ -34,13 +34,17 @@
         <% for(let shortURL in data[user_id].links) { %>
           <tr>
             <td>
-              <%= shortURL %>
+              <a href="/u/<%= shortURL %>">localhost:8080/u/<%= shortURL %></a>
               <form method="GET" action="/urls/<%= shortURL %>/">
                 <button>Edit</button>
               </form>
             </td>
             <td>
-              <%= data[user_id].links[shortURL]%>
+              <% if (data[user_id].links[shortURL].slice(0, 7) === "http://") { %>
+                <a href="<%= data[user_id].links[shortURL]%>"><%= data[user_id].links[shortURL]%></a>
+              <% } else { %>
+                <a href="http://<%= data[user_id].links[shortURL]%>">http://<%= data[user_id].links[shortURL]%></a>
+              <% } %>
               <form method="POST" action="/urls/<%= shortURL %>?_method=DELETE">
                 <button>Delete</button>
               </form>

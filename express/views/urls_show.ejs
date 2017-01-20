@@ -9,10 +9,15 @@
     <% if (!user_id) { %>
       <% include partials/_login %>
     <% } %>
-    <h1>Hello World</h1>
-    <%= "Your shortened URL is " %> &#8594; <%= shortURL %>
+    <h1>Your URLs</h1>
+    <%= "Your shortened URL is " %> &#8594; <a href="/u/<%= shortURL %>">localhost:8080/u/<%= shortURL %></a>
     <br/>
-    <%= "Your full URL is " %> &#8594; <%= data[user_id].links[shortURL] %>
+    <%= "Your full URL is " %> &#8594;
+    <% if (data[user_id].links[shortURL].slice(0, 7) === "http://") { %>
+      <a href="<%= data[user_id].links[shortURL] %>"><%= data[user_id].links[shortURL] %></a>
+    <% } else { %>
+      <a href="http://<%= data[user_id].links[shortURL] %>">http://<%= data[user_id].links[shortURL]%></a>
+    <% } %>
 
     <form method="POST" action="/urls/<%= shortURL %>?_method=DELETE">
       <button>Delete</button>

@@ -1,5 +1,4 @@
 const express = require("express");
-const jsonfile = require('jsonfile');
 const debug = require('debug');
 const bcrypt = require('bcrypt');
 const morgan = require('morgan');
@@ -260,16 +259,23 @@ server.get("/urls/:id", (request, response) => {
 });
 
 server.get("/u/:shortURL", (request, response) => {
-  let longURL = users[request.session.user_id].links[request.params.shortURL];
+  let longURL = "";
+  if (users[request.session.user_id].links[request.params.shortURL].slice(0, 7) === "http://") {
+    longURL = users[request.session.user_id].links[request.params.shortURL];
+  } else {
+    longURL = "http://" + users[request.session.user_id].links[request.params.shortURL];
+  }
   let urlExists = false;
 
   urlDatabase.forEach(function(url) {
-    if (url.shortURL === request.params.id) {
+    if (url.shortURL === request.params.shortURL) {
       urlExists = true;
+      return;
     }
   });
   if (urlExists === false) {
     response.status(404).send("You're lost! I can't find this page.");
+    return;
   }
   response.redirect(longURL);
 });
@@ -285,6 +291,7 @@ server.put("/urls/:id/", (request, response) => {
   urlDatabase.forEach(function(url) {
     if (url.shortURL === request.params.id) {
       urlExists = true;
+      return;
     }
   });
 
